@@ -1,0 +1,87 @@
+.createMealForm {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: 0 auto;
+}
+
+#createMealForm input[type="text"],
+#createMealForm input[type="number"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+#createMealForm button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;    
+}
+
+#createMealForm button:hover {
+    background-color: #0056b3;
+}
+
+#createMealForm label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#foodsContainer {
+    margin-top: 20px;
+}
+
+.form-container-meal p{
+    display: flex;
+    margin-bottom: 10px;
+}
+.form-container-meal label {
+    width:20%;
+}
+
+#createMeal a {
+    width: 100%;     
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;  
+}
+
+#create-meal-form {   
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: 0 auto;
+}
+
+#create-meal-form input[type="text"],
+#create-meal-form input[type="number"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+
+#create-meal-form button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;    
+}
+
+#create-meal-form:hover {
+    background-color: #0056b3;
+}
+
+#create-meal-form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}

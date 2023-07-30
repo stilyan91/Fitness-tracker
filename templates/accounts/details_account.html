@@ -1,0 +1,36 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block page_content %}
+    <h1>User Profile</h1>
+    <div class="user-profile">
+        <div class="profile-details">
+            {% if user.profile_picture.url  and not user.profile_picutre.empty %}
+                <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}'s profile picture">
+            {% else %}
+                <img src="{% static 'images/default-profile-picture.jpg' %}" alt="default-profile-picture.jpg">
+            {% endif %}
+
+            <p><strong>Username:</strong> {{ object.username }}</p>
+            <p><strong>Email:</strong> {{ object.email }}</p>
+            <p><strong>First Name:</strong> {{ object.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ object.last_name }}</p>
+            <p><strong>Age:</strong> {{ object.age }}</p>
+            <p><strong>Height:</strong> {{ object.height }}</p>
+            <p><strong>Weight:</strong> {{ object.weight }}</p>
+            <p><strong>Gender:</strong> {{ object.get_gender_display }}</p>
+        </div>
+        <div class="profile-details">
+
+            <p><strong>User Role:</strong> {{ object.get_user_role_display }}</p>
+            <p><strong>User Level:</strong> {{ object.get_user_level_display }}</p>
+            <p><strong>User Activity:</strong> {{ object.get_user_activity_display }}</p>
+            <p><strong>User Goal:</strong> {{ object.get_user_goal_display }}</p>
+            <p><strong>Date Joined:</strong> {{ object.date_joined }}</p>
+        </div>
+    </div>
+
+    <a href="{% url 'account update' pk=object.pk %}" class="redirect-update">
+        <button type="button" class="form-user-btn-update">Update information</button>
+    </a>
+{% endblock %}

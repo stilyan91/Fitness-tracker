@@ -1,0 +1,148 @@
+{% extends 'base/base.html' %}
+{% block page_content %}
+    <form id="createMealForm" method="POST">
+        {% csrf_token %}
+        <div class="form-container-meal">
+            <p>{{ form.name.label_tag }}
+                {{ form.name }}
+            </p>
+            <p>
+                <label for="mealVariety">Meal Variety:</label>
+                <select id="mealVariety" name="mealVariety">
+                    <!-- options will be filled with JavaScript -->
+                </select>
+            </p>
+
+            {% for field in form %}
+                {% if field.name != 'name' %}
+                    <p>
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </p>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+
+        <button type="button" onclick="searchFood()">Search Food</button>
+        <button type="button" onclick="clearFood()">Clear</button>
+        <button id="createMeal" onclick="createMeal()"><a href="{% url 'create meal' %}">Add to meal</a></button>
+    </form>
+
+    <div id="foodsContainer">
+
+    </div>
+
+    <script>
+
+        var foodData = {}; // Store the food data here
+
+        function getFoodVarieties(foodName) {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch('/api/get_food_varieties/', {
+                method: 'POST',
+                body: JSON.stringify({food: foodName, index: document.getElementById('mealVariety').value}),
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrftoken},
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(data => {
+                var dropdown = document.getElementById('mealVariety');
+
+                // Clear any existing options
+                dropdown.innerHTML = '';
+
+                // Populate dropdown with food varieties
+                data.varieties.map(function (variety, index) {
+                    var option = document.createElement('option');
+                    option.text = variety;
+                    option.value = index;
+                    dropdown.add(option);
+                });
+            }).catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+
+        document.getElementById('mealName').addEventListener('change', function () {
+            getFoodVarieties(this.value);
+        });
+
+        document.getElementById('id_quantity').addEventListener('change', function () {
+            searchFood(this.value)
+        });
+
+        function searchFood() {
+            const selectedVarietyIndex = document.getElementById('mealVariety').selectedIndex
+            const foodName = document.getElementById('mealName').value;
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch('/api/get_food_info/', {
+                method: 'POST',
+                body: JSON.stringify({food: foodName, index: selectedVarietyIndex}),
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrftoken},
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(data => {
+                // Store the food data globally
+                foodData = data;
+
+                let nutrientValues = {
+                    calories: parseFloat(foodData.calories),
+                    protein: parseFloat(foodData.protein),
+                    carbohydrates: parseFloat(foodData.carbohydrates),
+                    fats: parseFloat(foodData.fats)
+                };
+
+                let quantityInput = parseFloat(document.querySelector("#id_quantity").value);
+                let caloriesInput = document.querySelector("#id_calories");
+                let proteinInput = document.querySelector("#id_protein");
+                let carbohydratesInput = document.querySelector("#id_carbohydrates");
+                let fatsInput = document.querySelector("#id_fats");
+
+                // Check if the input values are numbers and if not, assign a default value
+                quantityInput = isNaN(quantityInput) ? 0 : quantityInput;
+                nutrientValues.calories = isNaN(nutrientValues.calories) ? 0 : nutrientValues.calories;
+                nutrientValues.protein = isNaN(nutrientValues.protein) ? 0 : nutrientValues.protein;
+                nutrientValues.carbohydrates = isNaN(nutrientValues.carbohydrates) ? 0 : nutrientValues.carbohydrates;
+                nutrientValues.fats = isNaN(nutrientValues.fats) ? 0 : nutrientValues.fats;
+
+                caloriesInput.value = ((quantityInput * nutrientValues.calories) / 100).toFixed(2);
+                proteinInput.value = ((quantityInput * nutrientValues.protein) / 100).toFixed(2);
+                carbohydratesInput.value = ((quantityInput * nutrientValues.carbohydrates) / 100).toFixed(2);
+                fatsInput.value = ((quantityInput * nutrientValues.fats) / 100).toFixed(2);
+            })
+
+
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        document.getElementById('mealVariety').addEventListener('change', function () {
+            searchFood()
+        })
+
+        function clearFood() {
+            console.log('asddasa')
+            let mealInput = document.querySelector('#mealName');
+            let quantityInput = document.querySelector("#id_quantity");
+            let caloriesInput = document.querySelector("#id_calories");
+            let proteinInput = document.querySelector("#id_protein");
+            let carbohydratesInput = document.querySelector("#id_carbohydrates");
+            let fatsInput = document.querySelector("#id_fats");
+            mealInput.value = '';
+            quantityInput.value = 0;
+            caloriesInput.value = 0;
+            proteinInput.value = 0;
+            carbohydratesInput.value = 0;
+            fatsInput.value = 0;
+        }
+    </script>
+{% endblock %}

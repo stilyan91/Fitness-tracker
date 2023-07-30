@@ -1,0 +1,34 @@
+<aside class="sidebar">
+    <ul class="aside-list">
+        <li class="nav-item">
+            <i class="fas fa-home"></i>
+            <a href="{% url 'home page' %}" class="nav-link active" aria-current="page">
+                Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <i class="fas fa-stream"></i>
+            <a href="{% url 'dashboard' pk=request.user.pk %}" class="nav-item">
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <i class="far fa-calendar"></i>
+            <a href="#" class="nav-item">
+                Calendar
+            </a>
+        </li>
+        <li class="nav-item">
+            <i class="fas fa-user"></i>
+            <a href="{% url 'account details' pk=request.user.pk %}" class=nav-item">
+                Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <a href="{% url 'account logout' %}" class="nav-item">
+                Logout
+            </a>
+        </li>
+    </ul>
+</aside>

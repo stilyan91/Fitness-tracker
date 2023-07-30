@@ -1,0 +1,12 @@
+{% extends 'base/base.html' %}
+{% block page_content %}
+    <h2 class="user-greetings">Hello, {{ object.username }}</h2>
+    <h3>That is yours information</h3>
+    <div>
+        <form action="{% url 'account update' pk=object.pk %}" method="post" class="update-user-container" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="form-user-btn-update">Update</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %}
+{% load my-custom-tags %}
+{% block page_content %}
+    <div class="login-container">
+        <div class="login-form col-md4 offset-md-4">
+            <form action="{% url 'account login' %}" method="post" class="login-form">
+                <input type="hidden" value="{{ next }}" name="next">
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                    {{ form.username }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                    {{ form.password }}
+                </div>
+                {% csrf_token %}
+                <button class="btn-login">Login</button>
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

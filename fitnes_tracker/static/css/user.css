@@ -1,0 +1,158 @@
+.user-greetings {
+  font-size: 50px;
+}
+
+.register-form label {
+  display: inline-block;
+  width: 200px; 
+  text-align: right;
+  margin-right: 10px;
+}
+.btn-register .form-user-btn-update {
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #ffc107; /* You can change this */
+  border: 1px solid transparent;
+  padding: 10px 20px;
+  font-size: 32px;
+  line-height: 1.5;
+  border-radius: 5px;
+  margin: 50px 300px;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.btn-register:hover {
+  color: #212529;
+  background-color: #e0a800; /* You can change this */
+  border-color: #d39e00; /* You can change this */
+}
+
+
+.update-user-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap:10px;
+  justify-content: end;
+  height: 400px;
+  overflow: auto;
+  height: 100%;
+}
+
+.form-user-btn-update:hover {
+  color: #212529;
+  background-color: #e0a800; /* You can change this */
+  border-color: #d39e00; /* You can change this */
+}
+
+.form-user-picture {
+  width: 400px;
+}
+
+.form-user-btn-update {
+  position: relative;
+  width: 300px;
+  margin-left: auto;
+}
+
+span .helptext{ 
+  font-size: 24px;
+}
+
+.form-user-activity {
+  width: 500px;
+}
+
+
+.btn-login .form-user-btn-update {
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #ffc107; /* You can change this */
+  border: 1px solid transparent;
+  padding: 10px 20px;
+  font-size: 32px;
+  line-height: 1.5;
+  border-radius: 5px;
+  margin: 50px 300px;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.btn-login:hover {
+  color: #212529;
+  background-color: #e0a800; /* You can change this */
+  border-color: #d39e00; /* You can change this */
+}
+
+.form-group{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  display: flex;
+  position: relative;
+  height: 70vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  gap:20px;
+}
+
+.login-form > button {
+  max-height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.form-group {
+  display: flex;
+  gap: 50px;
+  margin: 20px;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.user-profile {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.profile-details img {
+  max-width: 200px;
+  height: auto;
+  border-radius: 50%;
+}
+
+.profile-details p {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.redirect-update {
+  position: fixed;
+  bottom: 200px;
+  right: 100px;
+}

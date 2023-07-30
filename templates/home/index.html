@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block page_content %}
+    <section class="article-container">
+        {% for article in articlemodel_list %}
+            <div class="card-article" onclick='zoomFunction(this)'>
+                <h2 class="card-title">{{ article.title }}</h2>
+                <p class="card-content">{{ article.article_content }}</p>
+                <span class="card-creator">Created by {{ article.created_by }}</span>
+                <span class="date-creation">{{ article.date }}</span>
+                <div class="overlay"></div>
+            </div>
+        {% endfor %}
+    </section>
+{% endblock %}
