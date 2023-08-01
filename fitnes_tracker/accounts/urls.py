@@ -3,8 +3,8 @@ from django.conf.urls.static import static
 from django.urls import path
 
 from fitnes_tracker.accounts.views import RegisterAccountView, HomePageView, ProfileUpdateView, ProfileDetailsView, \
-    LoginUserView, LogoutUserView, generate_daily_report, DashboardUserView, GetFoodInfoView, GetFoodVarietiesView,\
-    CreateMealView
+    LoginUserView, LogoutUserView, generate_daily_report, DashboardUserView, GetFoodInfoView, GetFoodVarietiesView, \
+    CreateMealView, MealDetailsView, AddFoodToMealView
 
 urlpatterns = [
                   path('', HomePageView.as_view(), name='home page'),
@@ -18,4 +18,6 @@ urlpatterns = [
                   path('api/get_food_info/', GetFoodInfoView.as_view(), name='get_food_info'),
                   path('api/get_food_varieties/', GetFoodVarietiesView.as_view(), name='get_food_varieties'),
                   path('create_meal/', CreateMealView.as_view(), name='create meal'),
+                  path('meal_<int:pk>', MealDetailsView.as_view(), name='details meal'),
+                  path('meal/<int:meal_id>/add_food/', AddFoodToMealView.as_view(), name='add_food_to_meal')
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

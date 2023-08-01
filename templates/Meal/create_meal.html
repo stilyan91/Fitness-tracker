@@ -1,11 +1,18 @@
 {% extends 'base/base.html' %}
+
 {% block page_content %}
+  <div class="createMeal-container">
     <form action="{% url 'create meal' %}" id="createMealForm" method="POST">
         {% csrf_token %}
         <div class="form-container-meal">
             {{ form.as_p }}
-            <button type="button">Create Meal</button>
+        <button type="submit" class="create-meal-button">Create Meal</button>
         </div>
     </form>
+    <button type="button" id="add-ingredients">
+        <a href="{% url 'get_food_info' %}">ADD Ingredients</a>
+    </button>
+</div>
+
 
 {% endblock %}

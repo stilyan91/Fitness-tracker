@@ -138,6 +138,7 @@ class MealForm(forms.ModelForm):
 
 
 class CreateMealForm(forms.ModelForm):
+
     class Meta:
         model = Meal
         fields = '__all__'
@@ -147,10 +148,18 @@ class CreateMealForm(forms.ModelForm):
             "total_protein": 'Total protein - grams:',
             'total_carbs': 'Total carbs - grams:',
             'total_fats': 'Total fats - grams:',
-            'total_calories': 'Total calories - kcal:'
+            'total_calories': 'Total calories - kcal:',
+            'user': 'Created by:',
         }
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
         super().__init__(*args, **kwargs)
+        if self.request.user.is_authenticated:
+            self.fields['user'].initial = self.request.user
+            self.fields['user'].widget = forms.HiddenInput()
+        self.fields['username'] = forms.CharField(initial=self.request.user.username,
+                                                      widget=forms.TextInput(attrs={'readonly': 'readonly'}))
         for field_name in self.fields:
-            self.fields[field_name].widget.attrs.update({'class': 'create-meal-form', 'readonly': 'readonly'})
+            if self.fields[field_name] != self.fields['name']:
+                self.fields[field_name].widget.attrs.update({'class': 'create-meal-form', 'readonly': 'readonly'})

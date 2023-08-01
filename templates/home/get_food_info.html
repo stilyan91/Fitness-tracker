@@ -1,6 +1,6 @@
 {% extends 'base/base.html' %}
 {% block page_content %}
-    <form id="createMealForm" method="POST">
+    <form id="createMealForm" method="GET">
         {% csrf_token %}
         <div class="form-container-meal">
             <p>{{ form.name.label_tag }}
@@ -26,7 +26,7 @@
 
         <button type="button" onclick="searchFood()">Search Food</button>
         <button type="button" onclick="clearFood()">Clear</button>
-        <button id="createMeal" onclick="createMeal()"><a href="{% url 'create meal' %}">Add to meal</a></button>
+
     </form>
 
     <div id="foodsContainer">

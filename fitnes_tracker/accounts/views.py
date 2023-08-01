@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views import generic as views, View
@@ -148,12 +148,21 @@ class DashboardUserView(LoginRequiredMixin, views.TemplateView):
 class GetFoodInfoView(View):
     def get(self, request, *args, **kwargs):
         form = MealForm()
-        context = {
-            'form': form,
-        }
+        meal_id = request.session.get('meal_id')
+        if meal_id is not None:
+            meal = get_object_or_404(Meal, id=meal_id)
+            context = {
+                'form': form,
+                'meal': meal,
+            }
+        else:
+            context = {
+                'form': form
+            }
         return render(request, 'home/get_food_info.html', context=context)
 
     def post(self, request, *args, **kwargs):
+
         edamam = Edamam()
         try:
             data = json.loads(request.body)
@@ -172,19 +181,19 @@ class GetFoodInfoView(View):
             selected_food = foods[selected_index].get('food', {})
             nutrients = selected_food.get('nutrients', {})
 
-            ingredient = Ingredients.objects.create(
-                quantity=self.request.POST.get('quantity', 0),
-                name=selected_food.get('label', 'Unknown'),
-                calories=int(float(nutrients.get('ENERC_KCAL', 0))),
-                protein=int(float(nutrients.get('PROCNT', 0))),
-                carbohydrates=int(float(nutrients.get('CHOCDF', 0))),
-                fats=int(float(nutrients.get('FAT', 0))),
+            ingredient = {
+                'quantity': self.request.POST.get('quantity', 0),
+                'name': selected_food.get('label', 'Unknown'),
+                'calories': int(float(nutrients.get('ENERC_KCAL', 0))),
+                'protein': int(float(nutrients.get('PROCNT', 0))),
+                'carbohydrates': int(float(nutrients.get('CHOCDF', 0))),
+                'fats': int(float(nutrients.get('FAT', 0))),
+                'food_types': food_types,
+            }
+            # meal_dict = model_to_dict(ingredient)
+            # meal_dict["food_types"] = food_types
 
-            )
-            meal_dict = model_to_dict(ingredient)
-            meal_dict["food_types"] = food_types
-
-            return JsonResponse(meal_dict)
+            return JsonResponse(ingredient)
 
         return JsonResponse({'error': 'No food item found'}, status=404)
 
@@ -208,7 +217,46 @@ class GetFoodVarietiesView(View):
         return JsonResponse({'varieties': food_varieties})
 
 
-class CreateMealView(LoginRequiredMixin,views.CreateView):
-    template_name = 'home/create_meal.html'
+class CreateMealView(LoginRequiredMixin, views.CreateView):
+    template_name = 'Meal/create_meal.html'
     form_class = CreateMealForm
-    queryset = []
+    model = Meal
+    success_url = reverse_lazy('details meal')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('details meal', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class MealDetailsView(views.DetailView):
+    template_name = 'Meal/details_meal.html'
+    model = Meal
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['meal_dict'] = model_to_dict(self.object)
+        print(context)
+        return context
+
+
+class AddFoodToMealView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        meal_id = request.POST.get('meal_id')
+        food = request.POST.get('food')
+        try:
+            meal = Meal.objects.get(id=meal_id)
+            ingredients = meal.list_of_ingredients
+            ingredients.append(food)
+            meal.list_of_ingredients = ingredients
+            meal.save()
+            return JsonResponse({'redirect': 'details meal'})
+        except Meal.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Meal does not exist'}, status=404)
