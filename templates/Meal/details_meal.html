@@ -10,33 +10,6 @@
         {% endfor %}
     </div>
 
-    <button type="button" id="createMeal"><a href="{% url 'get_food_info' %}">Add ingredients</a></button>
-
-{#    <script>#}
-{#        document.querySelector('#createMeal').addEventListener('click', (e) => {#}
-{#            e.preventDefault();#}
-{#            const foodData = new FormData(document.querySelector('#foodForm'));#}
-{##}
-{#            // Set the URL according to whether there is a meal_id#}
-{#            let url = "{% if meal %}{% url 'add_food_to_meal' meal.id %}{% else %}{% url 'get_food_info' %}{% endif %}";#}
-{##}
-{#            fetch(url, {#}
-{#                method: 'POST',#}
-{#                body: foodData,#}
-{#            })#}
-{#                .then(response => response.json())#}
-{#                .then(data => {#}
-{#                    if (data.status === 'success') {#}
-{#                        // Redirect to the URL provided by the server#}
-{#                        window.location.href = data.redirect_url;#}
-{#                    } else {#}
-{#                        // Handle error#}
-{#                    }#}
-{#                })#}
-{#                .catch((error) => {#}
-{#                    console.error('Error:', error);#}
-{#                });#}
-{#        });#}
-{#    </script>#}
+  <button type="button" id="add-ingredients"><a href="{% url 'get_food_info' %}">ADD Ingredients</a></button>
 
 {% endblock %}

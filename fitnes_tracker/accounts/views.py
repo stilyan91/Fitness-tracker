@@ -149,16 +149,24 @@ class GetFoodInfoView(View):
     def get(self, request, *args, **kwargs):
         form = MealForm()
         meal_id = request.session.get('meal_id')
+        coming_from_details = request.session.get('coming_from_details', False)
+        request.session['coming_from_details'] = False
+        request.session.modified = True
         if meal_id is not None:
             meal = get_object_or_404(Meal, id=meal_id)
             context = {
                 'form': form,
                 'meal': meal,
+                'meal_id': meal_id,
+                'show_add_ingredient_button': coming_from_details,
             }
         else:
             context = {
-                'form': form
+                'form': form,
+                'meal_id': None,
+                'show_add_ingredient_button': coming_from_details,
             }
+
         return render(request, 'home/get_food_info.html', context=context)
 
     def post(self, request, *args, **kwargs):
@@ -170,6 +178,7 @@ class GetFoodInfoView(View):
             data = {}
         meal_name = data.get('food')
         selected_index = int(data.get('index', 0))
+        meal_id = request.session.get('meal_id')
 
         if not meal_name:
             return JsonResponse({'error': 'No meal name provided'}, status=400)
@@ -189,6 +198,7 @@ class GetFoodInfoView(View):
                 'carbohydrates': int(float(nutrients.get('CHOCDF', 0))),
                 'fats': int(float(nutrients.get('FAT', 0))),
                 'food_types': food_types,
+                'meal_id': meal_id,
             }
             # meal_dict = model_to_dict(ingredient)
             # meal_dict["food_types"] = food_types
@@ -240,10 +250,16 @@ class MealDetailsView(views.DetailView):
     template_name = 'Meal/details_meal.html'
     model = Meal
 
+    def get(self, request, *args, **kwargs):
+        request.session['coming_from_details'] = True
+        meal = self.get_object()
+        request.session['meal_id'] = meal.id
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['meal_dict'] = model_to_dict(self.object)
-        print(context)
+        context['meal_id'] = self.object.id
         return context
 
 
@@ -257,6 +273,28 @@ class AddFoodToMealView(LoginRequiredMixin, View):
             ingredients.append(food)
             meal.list_of_ingredients = ingredients
             meal.save()
-            return JsonResponse({'redirect': 'details meal'})
+            return redirect('meal_details', pk=meal_id)
         except Meal.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Meal does not exist'}, status=404)
+
+class AddIngredientToMealView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, meal_id):
+        # Load the JSON data from the request
+        data = json.loads(request.body)
+
+        # Get the meal object
+        meal = Meal.objects.get(pk=meal_id)
+
+        # Add the new ingredient data to the meal
+        meal.list_of_ingredients.append(data)
+
+        # Save the changes
+        meal.save()
+
+        # Return a success response
+        return JsonResponse({'success': True})

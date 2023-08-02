@@ -19,5 +19,7 @@ urlpatterns = [
                   path('api/get_food_varieties/', GetFoodVarietiesView.as_view(), name='get_food_varieties'),
                   path('create_meal/', CreateMealView.as_view(), name='create meal'),
                   path('meal_<int:pk>', MealDetailsView.as_view(), name='details meal'),
-                  path('meal/<int:meal_id>/add_food/', AddFoodToMealView.as_view(), name='add_food_to_meal')
+                  path('meal/<int:meal_id>/add_food/', AddFoodToMealView.as_view(), name='add_food_to_meal'),
+
+
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

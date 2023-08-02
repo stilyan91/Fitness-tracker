@@ -26,12 +26,11 @@
 
         <button type="button" onclick="searchFood()">Search Food</button>
         <button type="button" onclick="clearFood()">Clear</button>
+        {% if show_add_ingredient_button %}
+            <button type="button" id="add-ingredients">ADD Ingredients</button>
+        {% endif %}
 
     </form>
-
-    <div id="foodsContainer">
-
-    </div>
 
     <script>
 
@@ -130,7 +129,7 @@
         })
 
         function clearFood() {
-            console.log('asddasa')
+
             let mealInput = document.querySelector('#mealName');
             let quantityInput = document.querySelector("#id_quantity");
             let caloriesInput = document.querySelector("#id_calories");
@@ -144,5 +143,52 @@
             carbohydratesInput.value = 0;
             fatsInput.value = 0;
         }
+
+        document.getElementById('add-ingredients').addEventListener('click', function () {
+            var mealId = {{ meal_id}};
+            var selectedIngredient = getSelectedIngredient()
+            addIngredientToMeal(mealId, selectedIngredient)
+        })
+
+
+        function addIngredientToMeal(mealId, selectedIngredient) {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`{% url 'add_food_to_meal' meal_id=mealId%}/`, {
+                method: 'POST',
+                body: JSON.stringify(selectedIngredient),
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrftoken},
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(data => {
+                // Successfully added ingredient to meal
+                window.location.hash = `{% url 'details meal' pk=mealId %}`
+            }).catch(error => {
+                console.error('There was a problem with the request:', error);
+            });
+        }
+
+        function getSelectedIngredient() {
+            let mealInput = document.querySelector('#mealName');
+            let variety = document.querySelector('#mealVariety');
+            let quantityInput = document.querySelector("#id_quantity");
+            let caloriesInput = document.querySelector("#id_calories");
+            let proteinInput = document.querySelector("#id_protein");
+            let carbohydratesInput = document.querySelector("#id_carbohydrates");
+            let fatsInput = document.querySelector("#id_fats");
+            return {
+                name: mealInput.value,
+                var: variety.value,
+                quantity: quantityInput.value,
+                calories: caloriesInput.value,
+                protein: proteinInput.value,
+                carbohydrates: carbohydratesInput.value,
+                fats: fatsInput.value,
+            };
+        }
+
     </script>
 {% endblock %}
