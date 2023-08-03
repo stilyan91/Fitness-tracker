@@ -168,16 +168,16 @@ class Ingredients(models.Model):
     quantity = models.IntegerField(null=True, blank=True, verbose_name='quantity', validators=[MinValueValidator(0)])
 
     def __str__(self):
-        return self.name
+        return f'{self.name} - Calories: {self.calories}, Protein: {self.protein}, Carbs: {self.carbohydrates}, Fats: {self.fats}'
 
 
 class Meal(models.Model):
     name = models.CharField(max_length=30, validators=[MinLengthValidator(4)])
-    total_calories = models.IntegerField(default=0, validators=[MinValueValidator(0)],blank=True,null=True)
-    list_of_ingredients = models.JSONField(default=list,blank=True,null=True)
-    total_protein = models.IntegerField(default=0, validators=[MinValueValidator(0)],blank=True,null=True)
-    total_carbs = models.IntegerField(default=0, validators=[MinValueValidator(0)],blank=True,null=True)
-    total_fats = models.IntegerField(default=0, validators=[MinValueValidator(0)],blank=True,null=True)
+    total_calories = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
+    list_of_ingredients = models.JSONField(default=list, blank=True, null=True)
+    total_protein = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
+    total_carbs = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
+    total_fats = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     # class Meal(models.Model):
     #     name = models.CharField(max_length=30)
@@ -187,35 +187,33 @@ class Meal(models.Model):
     #     total_fats = models.IntegerField(default=0)
     #     ingredients = models.JSONField(default=list)
 
-
-        # def add_ingredient(self, ingredient_name, quantity):
-        #     # Replace this with the actual API call and the correct URL
-        #     url = f"https://api.example.com/ingredients?ingredient={ingredient_name}&quantity={quantity}"
-        #     response = requests.get(url)
-        #     data = response.json()
-        #
-        #     # Update the total nutrients based on the API response
-        #     self.total_calories += data['calories']
-        #     self.total_protein += data['protein']
-        #     self.total_carbs += data['carbs']
-        #     self.total_fats += data['fats']
-        #
-        #     # Append the new ingredient and its data to the ingredients list
-        #     self.ingredients.append({
-        #         'name': ingredient_name,
-        #         'quantity': quantity,
-        #         'calories': data['calories'],
-        #         'protein': data['protein'],
-        #         'carbs': data['carbs'],
-        #         'fats': data['fats'],
-        #     })
-        #
-        #     # Save the changes to the database
-        #     self.save()
-        #
-        # def __str__(self):
-        #     return self.name
-
+    # def add_ingredient(self, ingredient_name, quantity):
+    #     # Replace this with the actual API call and the correct URL
+    #     url = f"https://api.example.com/ingredients?ingredient={ingredient_name}&quantity={quantity}"
+    #     response = requests.get(url)
+    #     data = response.json()
+    #
+    #     # Update the total nutrients based on the API response
+    #     self.total_calories += data['calories']
+    #     self.total_protein += data['protein']
+    #     self.total_carbs += data['carbs']
+    #     self.total_fats += data['fats']
+    #
+    #     # Append the new ingredient and its data to the ingredients list
+    #     self.ingredients.append({
+    #         'name': ingredient_name,
+    #         'quantity': quantity,
+    #         'calories': data['calories'],
+    #         'protein': data['protein'],
+    #         'carbs': data['carbs'],
+    #         'fats': data['fats'],
+    #     })
+    #
+    #     # Save the changes to the database
+    #     self.save()
+    #
+    # def __str__(self):
+    #     return self.name
 
     # def calc_total_calories(self):
     #     if self.list_of_ingredients:

@@ -31,10 +31,9 @@
         {% endif %}
 
     </form>
-
     <script>
 
-        var foodData = {}; // Store the food data here
+        var foodData = {};
 
         function getFoodVarieties(foodName) {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -145,30 +144,32 @@
         }
 
         document.getElementById('add-ingredients').addEventListener('click', function () {
-            var mealId = {{ meal_id}};
-            var selectedIngredient = getSelectedIngredient()
-            addIngredientToMeal(mealId, selectedIngredient)
-        })
+            var mealId = {{ meal_id }};
+            var selectedIngredient = getSelectedIngredient();
+            addIngredientToMeal(mealId, selectedIngredient);
+            target.event.preventDefault()
 
+        });
 
         function addIngredientToMeal(mealId, selectedIngredient) {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch(`{% url 'add_food_to_meal' meal_id=mealId%}/`, {
+            var url = `/meal_${mealId}/add_food/`;
+            fetch(url, {
                 method: 'POST',
-                body: JSON.stringify(selectedIngredient),
+                body: JSON.stringify({meal_id: mealId, selectedIngredient: selectedIngredient}),
                 headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrftoken},
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            }).then(data => {
-                // Successfully added ingredient to meal
-                window.location.hash = `{% url 'details meal' pk=mealId %}`
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                }).then(data => {
+                window.location.href = `/meal_${mealId}`
             }).catch(error => {
                 console.error('There was a problem with the request:', error);
             });
+
         }
 
         function getSelectedIngredient() {

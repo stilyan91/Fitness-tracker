@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import model_to_dict
@@ -6,7 +7,7 @@ from django.utils import timezone
 
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
@@ -16,6 +17,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import FormMixin
 from django.contrib.auth import views as auth_views
 from django.http import JsonResponse
+from rest_framework import serializers, status
+from rest_framework.generics import UpdateAPIView
+from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
@@ -263,38 +267,49 @@ class MealDetailsView(views.DetailView):
         return context
 
 
-class AddFoodToMealView(LoginRequiredMixin, View):
+class IngredientsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredients
+        fields = ['name', 'quantity', 'calories', 'protein', 'carbohydrates', 'fats']
+
+
+class MealSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meal
+        fields = '__all__'
+
+
+class AddIngredientToMealView(UpdateAPIView):
+    queryset = Meal.objects.all()
+    serializer_class = MealSerializer
+
     def post(self, request, *args, **kwargs):
-        meal_id = request.POST.get('meal_id')
-        food = request.POST.get('food')
-        try:
-            meal = Meal.objects.get(id=meal_id)
-            ingredients = meal.list_of_ingredients
-            ingredients.append(food)
-            meal.list_of_ingredients = ingredients
-            meal.save()
-            return redirect('meal_details', pk=meal_id)
-        except Meal.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Meal does not exist'}, status=404)
+        meal = self.get_object()  # Get the meal object related to the provided pk
 
-class AddIngredientToMealView(View):
+        # Get the selected ingredient from the request body
+        selected_ingredient = request.data.get('selectedIngredient')
 
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+        if selected_ingredient:
+            ingredient, created = Ingredients.objects.get_or_create(
+                name=selected_ingredient['name'],
+                quantity=selected_ingredient['quantity'],
+                calories=float(selected_ingredient['calories']),
+                protein=float(selected_ingredient['protein']),
+                carbohydrates=float(selected_ingredient['carbohydrates']),
+                fats=float(selected_ingredient['fats']),
+            )
+            ingredient_serializer = IngredientsSerializer(ingredient)
+            ingredient_data = ingredient_serializer.data
+            ingredient_data.pop('id', None)
+            ingredient_data = {str(key).replace("'", ""): str(value).replace("'", "") for key, value in
+                               ingredient_data.items()}
+            meal.list_of_ingredients.append(ingredient_data)
 
-    def post(self, request, meal_id):
-        # Load the JSON data from the request
-        data = json.loads(request.body)
-
-        # Get the meal object
-        meal = Meal.objects.get(pk=meal_id)
-
-        # Add the new ingredient data to the meal
-        meal.list_of_ingredients.append(data)
-
-        # Save the changes
+        meal.total_calories += float(selected_ingredient['calories'])
+        meal.total_carbs += float(selected_ingredient['carbohydrates'])
+        meal.total_fats += float(selected_ingredient['fats'])
+        meal.total_protein += float(selected_ingredient['protein'])
         meal.save()
 
-        # Return a success response
-        return JsonResponse({'success': True})
+        meal_serializer = self.get_serializer(meal)
+        return Response(meal_serializer.data, status=status.HTTP_200_OK)

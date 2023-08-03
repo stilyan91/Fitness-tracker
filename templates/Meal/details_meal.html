@@ -4,12 +4,22 @@
     <h1>{{ meal.name }}</h1>
     <div class="meal-info-container">
         {% for field, value in meal_dict.items %}
-            {% if field != 'id' and field != 'user' %}
+            {% if field != 'id' and field != 'user' and field != 'list_of_ingredients' %}
                 <p><strong>{{ field|capfirst }}</strong>: {{ value }}</p>
             {% endif %}
         {% endfor %}
     </div>
 
-  <button type="button" id="add-ingredients"><a href="{% url 'get_food_info' %}">ADD Ingredients</a></button>
+    <h2>Ingredients:</h2>
+    <ul>
+        {% for ingredient in meal.list_of_ingredients %}
+            <li>
+                <strong>{{ ingredient.name }}</strong> - {{ ingredient.quantity }} grams,
+                Calories: {{ ingredient.calories|default:"0" }} kcal, Protein: {{ ingredient.protein|default:"0" }} g,
+                Carbs: {{ ingredient.carbohydrates|default:"0" }} g, Fats: {{ ingredient.fats|default:"0" }} g
+            </li>
+        {% endfor %}
+    </ul>
+    <button type="button" id="add-ingredients"><a href="{% url 'get_food_info' %}">ADD Ingredients</a></button>
 
 {% endblock %}
