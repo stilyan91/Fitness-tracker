@@ -2,14 +2,42 @@
 {% load static %}
 {% block page_content %}
     <section class="article-container">
-        {% for article in articlemodel_list %}
-            <div class="card-article" onclick='zoomFunction(this)'>
-                <h2 class="card-title">{{ article.title }}</h2>
-                <p class="card-content">{{ article.article_content }}</p>
-                <span class="card-creator">Created by {{ article.created_by }}</span>
-                <span class="date-creation">{{ article.date }}</span>
+        {% for meal in meals %}
+            <div class="card-article" onclick="window.location.href='/meal_{{ meal.id }}'">
+                <h2 class="card-title">{{ meal.name| capfirst }}</h2>
+                {% for ingredient in meal.list_of_ingredients %}
+                    <p class="card-content"><strong>{{ ingredient.name }}</strong> - {{ ingredient.quantity }} grams,
+                        Calories: {{ ingredient.calories|default:"0" }} kcal,
+                        Protein: {{ ingredient.protein|default:"0" }} g,
+                        Carbs: {{ ingredient.carbohydrates|default:"0" }} g, Fats: {{ ingredient.fats|default:"0" }} g
+                    </p>
+                {% endfor %}
+                <span class="card-content">Nutrition: </span>
+                <span class="card-content">Total calories: {{ meal.total_calories }}</span>
+                <span class="card-content">Total protein: {{ meal.total_protein }}</span>
+                <span class="card-content">Total Carbs: {{ meal.total_carbs }}</span>
+                <span class="card-content">Total fats: {{ meal.total_fats }}</span>
+                <span class="card-creator">Created by {{ meal.user }}</span>
                 <div class="overlay"></div>
             </div>
         {% endfor %}
+
     </section>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next page</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last page &raquo;</a>
+            {% endif %}
+        </span>
+
 {% endblock %}

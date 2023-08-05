@@ -1,0 +1,78 @@
+{% extends 'base/base.html' %}
+{% block page_content %}
+
+    <h1>{{ meal.name }}</h1>
+    <div class="meal-info-container">
+        {% for field, value in meal_dict.items %}
+            {% if field != 'id' and field != 'user' and field != 'list_of_ingredients' %}
+                <p><strong>{{ field|capfirst }}</strong>: {{ value }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <h2><strong>Ingredients</strong>:</h2>
+    <ul>
+        {% for ingredient in meal.list_of_ingredients %}
+            <li>
+                <strong>{{ ingredient.name }}</strong> - {{ ingredient.quantity }} grams,
+                Calories: {{ ingredient.calories|default:"0" }} kcal, Protein: {{ ingredient.protein|default:"0" }} g,
+                Carbs: {{ ingredient.carbohydrates|default:"0" }} g, Fats: {{ ingredient.fats|default:"0" }} g
+                <button type="button" class="remove-ingredient-btn">Remove</button>
+            </li>
+        {% endfor %}
+    </ul>
+    <p><strong>Total calories: {{ meal.total_calories }} kcal Protein: {{ meal.total_protein }} grams, Carbs: {{ meal.total_carbs }}
+        grams, Fats: {{ meal.total_fats }} grams</strong></p>
+    <button type="button" id="add-ingredients"><a href="{% url 'get_food_info' %}">ADD Ingredients</a></button>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var removeBtn = document.querySelectorAll('.remove-ingredient-btn')
+        removeBtn.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault()
+                var li = this.parentElement;
+                var mealId = {{ meal.id }}
+                    li.parentElement.removeChild(li)
+                const nameInput = this.parentElement
+
+                fetch(`/meal_${mealId}/edit/`, {
+                    method: "POST",
+                    headers: {
+                        'Content-type': "application/json",
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({
+                        name: nameInput.textContent,
+                    })
+
+                })
+                    .then(function (response) {
+                        if (response.ok) {
+                            console.log(response)
+                             location.reload();
+                        } else {
+                            console.error('Failed to remove ingredient from meal')
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('Error: ', error)
+                    });
+            })
+        })
+    </script>
+{% endblock %}

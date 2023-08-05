@@ -1,0 +1,13 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+    <h2>Delete {{ object.name }}</h2>
+    <p>Are you sure you want to delete the meal "{{ object.name }}"?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="submit" value="Confirm Delete" class="delete-meal-confirm">
+        <a href="{% url 'home page' %}" class="delete-meal-confirm">Cancel</a>
+    </form>
+
+{% endblock %}

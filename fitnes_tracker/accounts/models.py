@@ -179,61 +179,13 @@ class Meal(models.Model):
     total_carbs = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
     total_fats = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    # class Meal(models.Model):
-    #     name = models.CharField(max_length=30)
-    #     total_calories = models.IntegerField(default=0)
-    #     total_protein = models.IntegerField(default=0)
-    #     total_carbs = models.IntegerField(default=0)
-    #     total_fats = models.IntegerField(default=0)
-    #     ingredients = models.JSONField(default=list)
 
-    # def add_ingredient(self, ingredient_name, quantity):
-    #     # Replace this with the actual API call and the correct URL
-    #     url = f"https://api.example.com/ingredients?ingredient={ingredient_name}&quantity={quantity}"
-    #     response = requests.get(url)
-    #     data = response.json()
-    #
-    #     # Update the total nutrients based on the API response
-    #     self.total_calories += data['calories']
-    #     self.total_protein += data['protein']
-    #     self.total_carbs += data['carbs']
-    #     self.total_fats += data['fats']
-    #
-    #     # Append the new ingredient and its data to the ingredients list
-    #     self.ingredients.append({
-    #         'name': ingredient_name,
-    #         'quantity': quantity,
-    #         'calories': data['calories'],
-    #         'protein': data['protein'],
-    #         'carbs': data['carbs'],
-    #         'fats': data['fats'],
-    #     })
-    #
-    #     # Save the changes to the database
-    #     self.save()
-    #
-    # def __str__(self):
-    #     return self.name
+    class Meta:
+        unique_together = [['name', 'user']]
 
-    # def calc_total_calories(self):
-    #     if self.list_of_ingredients:
-    #         self.total_calories = sum([ingredient.calories for ingredient in self.list_of_ingredients])
-    #     return self.total_calories
-    #
-    # def calc_total_protein(self):
-    #     if self.list_of_ingredients:
-    #         self.total_protein = sum([ingredient.protein for ingredient in self.list_of_ingredients])
-    #     return self.total_protein
-    #
-    # def calc_total_carbs(self):
-    #     if self.list_of_ingredients:
-    #         self.total_carbs = sum([ingredient.carbohydrates for ingredient in self.list_of_ingredients])
-    #     return self.total_carbs
-    #
-    # def calc_total_fats(self):
-    #     if self.list_of_ingredients:
-    #         self.total_fats = sum([ingredient.fats for ingredient in self.list_of_ingredients])
-    #     return self.total_fats
+    def save(self, *args, **kwargs):
+        self.name = f"{self.name} by {self.user.username}"
+        return super().save(*args, **kwargs)
 
 
 class MealPlan(models.Model):
@@ -251,9 +203,6 @@ class Exercise(models.Model):
     muscle_group = models.CharField(max_length=30)
     description = models.TextField()
     video_link = models.URLField(null=True, blank=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Workout(models.Model):

@@ -9,7 +9,6 @@
             <p>
                 <label for="mealVariety">Meal Variety:</label>
                 <select id="mealVariety" name="mealVariety">
-                    <!-- options will be filled with JavaScript -->
                 </select>
             </p>
 
@@ -24,7 +23,7 @@
 
         </div>
 
-        <button type="button" onclick="searchFood()">Search Food</button>
+        <button type="button" onclick="searchFood()">Get Info</button>
         <button type="button" onclick="clearFood()">Clear</button>
         {% if show_add_ingredient_button %}
             <button type="button" id="add-ingredients">ADD Ingredients</button>
@@ -32,6 +31,16 @@
 
     </form>
     <script>
+        function validateFields() {
+
+            let caloriesInput = parseFloat(document.querySelector('#id_calories').value);
+
+            if (caloriesInput === 0) {
+                alert("Please make sure to fill out protein, carbs, and fats fields!");
+                return false;
+            }
+            return true;
+        }
 
         var foodData = {};
 
@@ -71,6 +80,8 @@
 
         document.getElementById('id_quantity').addEventListener('change', function () {
             searchFood(this.value)
+
+
         });
 
         function searchFood() {
@@ -88,7 +99,7 @@
                 }
                 return response.json();
             }).then(data => {
-                // Store the food data globally
+
                 foodData = data;
 
                 let nutrientValues = {
@@ -104,7 +115,6 @@
                 let carbohydratesInput = document.querySelector("#id_carbohydrates");
                 let fatsInput = document.querySelector("#id_fats");
 
-                // Check if the input values are numbers and if not, assign a default value
                 quantityInput = isNaN(quantityInput) ? 0 : quantityInput;
                 nutrientValues.calories = isNaN(nutrientValues.calories) ? 0 : nutrientValues.calories;
                 nutrientValues.protein = isNaN(nutrientValues.protein) ? 0 : nutrientValues.protein;
@@ -116,7 +126,6 @@
                 carbohydratesInput.value = ((quantityInput * nutrientValues.carbohydrates) / 100).toFixed(2);
                 fatsInput.value = ((quantityInput * nutrientValues.fats) / 100).toFixed(2);
             })
-
 
                 .catch(error => {
                     console.error('There was a problem with the fetch operation:', error);
@@ -143,13 +152,18 @@
             fatsInput.value = 0;
         }
 
-        document.getElementById('add-ingredients').addEventListener('click', function () {
-            var mealId = {{ meal_id }};
-            var selectedIngredient = getSelectedIngredient();
-            addIngredientToMeal(mealId, selectedIngredient);
-            target.event.preventDefault()
+        const addButton = document.getElementById('add-ingredients');
+        if (addButton) {
+            addButton.addEventListener('click', function (event) {
+                if (validateFields()) {
+                    var mealId = {{ meal_id }};
+                    var selectedIngredient = getSelectedIngredient();
+                    addIngredientToMeal(mealId, selectedIngredient);
+                }
+                event.preventDefault();
 
-        });
+            });
+        }
 
         function addIngredientToMeal(mealId, selectedIngredient) {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;

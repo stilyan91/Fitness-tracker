@@ -132,3 +132,90 @@
 #add-ingredients {
     margin-bottom: 10px;
 }
+
+
+#edit-meal {
+    width: 300px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+}
+
+#edit-meal a {
+    display: block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+    text-decoration: none; 
+}
+
+.remove-ingredient-btn {
+    padding: 10px 20px;
+    margin-left: 20px;
+    margin-top:20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+}
+
+#delete-ingredients{
+    width: 300px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+}
+#delete-ingredients a {
+    display: block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+    text-decoration: none; 
+}
+
+
+#delete-meal { 
+    width: 300px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+}
+#delete-meal a {
+    display: block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+    text-decoration: none; 
+}
+
+.delete-meal-confirm {
+    width: 300px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+    text-decoration: none;
+
+}
+

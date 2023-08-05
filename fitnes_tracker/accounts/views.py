@@ -1,13 +1,14 @@
 import json
-from collections import OrderedDict
+import re
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.forms import model_to_dict
 from django.utils import timezone
 
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
@@ -19,6 +20,7 @@ from django.contrib.auth import views as auth_views
 from django.http import JsonResponse
 from rest_framework import serializers, status
 from rest_framework.generics import UpdateAPIView
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
@@ -43,7 +45,10 @@ class OnlyNotRegisteredUsers:
 
 class HomePageView(views.ListView):
     template_name = 'home/index.html'
-    model = ArticleModel
+    model = Meal
+    context_object_name = 'meals'
+    paginate_by = 12
+    ordering = ['name']
 
 
 class RegisterAccountView(OnlyNotRegisteredUsers, views.CreateView):
@@ -236,6 +241,7 @@ class CreateMealView(LoginRequiredMixin, views.CreateView):
     form_class = CreateMealForm
     model = Meal
     success_url = reverse_lazy('details meal')
+    exclude = ['list_of_ingredients']
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -279,14 +285,12 @@ class MealSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AddIngredientToMealView(UpdateAPIView):
+class AddIngredientToMealView(LoginRequiredMixin, UpdateAPIView):
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
 
     def post(self, request, *args, **kwargs):
-        meal = self.get_object()  # Get the meal object related to the provided pk
-
-        # Get the selected ingredient from the request body
+        meal = self.get_object()
         selected_ingredient = request.data.get('selectedIngredient')
 
         if selected_ingredient:
@@ -313,3 +317,67 @@ class AddIngredientToMealView(UpdateAPIView):
 
         meal_serializer = self.get_serializer(meal)
         return Response(meal_serializer.data, status=status.HTTP_200_OK)
+
+
+class MealEditView(LoginRequiredMixin, views.UpdateView):
+    model = Meal
+    fields = '__all__'
+    template_name = 'Meal/edit_meal.html'
+
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        meal = get_object_or_404(Meal, pk=pk)
+        if self.request.user != meal.user:
+            raise PermissionDenied
+        return meal
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        data_as_text = data['name']
+
+        name_match = re.search(r'\s*(.*?)\s*-', data_as_text)
+        quantity_match = re.search(r'(\d+)\s*', data_as_text)
+        calories_match = re.search(r"Calories: (\d+)", data_as_text)
+        protein_match = re.search(r"Protein: (\d+)", data_as_text)
+        carbs_match = re.search(r"Carbs: (\d+)", data_as_text)
+        fats_match = re.search(r"Fats: (\d+)", data_as_text)
+        nutrition_info = {
+            'fats': str(int(fats_match.group(1))) if fats_match else 0,
+            'name': name_match.group(1) if name_match else None,
+            'protein': str(int(protein_match.group(1))) if protein_match else 0,
+            'calories': str(int(calories_match.group(1))) if calories_match else 0,
+            'quantity': str(int(quantity_match.group(1))) if quantity_match else 0,
+            'carbohydrates': str(int(carbs_match.group(1))) if carbs_match else 0,
+        }
+
+        meal = self.get_object()
+        matched_ingredients = [ingredient for ingredient in meal.list_of_ingredients if
+                               ingredient != nutrition_info]
+
+        meal.total_fats -= int(nutrition_info['fats'])
+        meal.total_protein -= int(nutrition_info['protein'])
+        meal.total_carbs -= int(nutrition_info['carbohydrates'])
+        meal.total_calories -= int(nutrition_info['calories'])
+
+        meal.list_of_ingredients = matched_ingredients
+        meal.save()
+
+        return JsonResponse({'status': 'success'})
+
+
+@method_decorator(login_required, name='dispatch')
+class DeleteMealView(LoginRequiredMixin, views.DeleteView):
+    model = Meal
+    template_name = 'Meal/delete_meal.html'
+    success_url = reverse_lazy('home page')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object()
+        if not obj.user == self.request.user:
+            raise Http404
+        else:
+            return obj

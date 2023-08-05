@@ -4,7 +4,7 @@ from django.urls import path
 
 from fitnes_tracker.accounts.views import RegisterAccountView, HomePageView, ProfileUpdateView, ProfileDetailsView, \
     LoginUserView, LogoutUserView, generate_daily_report, DashboardUserView, GetFoodInfoView, GetFoodVarietiesView, \
-    CreateMealView, MealDetailsView, AddIngredientToMealView
+    CreateMealView, MealDetailsView, AddIngredientToMealView, MealEditView, DeleteMealView
 
 urlpatterns = [
                   path('', HomePageView.as_view(), name='home page'),
@@ -20,5 +20,7 @@ urlpatterns = [
                   path('create_meal/', CreateMealView.as_view(), name='create meal'),
                   path('meal_<int:pk>', MealDetailsView.as_view(), name='details meal'),
                   path('meal_<int:pk>/add_food/', AddIngredientToMealView.as_view(), name='add_food_to_meal'),
+                  path('meal_<int:pk>/edit/', MealEditView.as_view(), name='edit_meal'),
+                  path('meal_<int:pk>/delete/', DeleteMealView.as_view(), name='delete_meal'),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

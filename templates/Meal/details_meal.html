@@ -10,7 +10,7 @@
         {% endfor %}
     </div>
 
-    <h2>Ingredients:</h2>
+    <h2><strong>Ingredients</strong>:</h2>
     <ul>
         {% for ingredient in meal.list_of_ingredients %}
             <li>
@@ -20,6 +20,13 @@
             </li>
         {% endfor %}
     </ul>
-    <button type="button" id="add-ingredients"><a href="{% url 'get_food_info' %}">ADD Ingredients</a></button>
+    {% if request.user == meal.user %}
+        <button type="button" id="add-ingredients"><a href="{% url 'get_food_info' %}">ADD Ingredients</a></button>
+        <button type="button" id="edit-meal"><a href="{% url 'edit_meal' pk=meal.id %}">Remove Ingredients</a></button>
+        <button type="button" id="delete-meal"><a href="{% url 'delete_meal' pk=meal.id %}">Delete meal</a></button>
+    {% endif %}
+
+
+
 
 {% endblock %}
