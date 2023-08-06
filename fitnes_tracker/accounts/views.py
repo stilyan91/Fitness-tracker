@@ -25,8 +25,9 @@ from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
-from fitnes_tracker.accounts.forms import RegisterUserForm, UserDetailsForm, LoginUserForm, MealForm, CreateMealForm
-from fitnes_tracker.accounts.models import ArticleModel, FitnessUser, DailyUserReport, DailyCalorieIntake, Meal, \
+from fitnes_tracker.accounts.forms import RegisterUserForm, UserDetailsForm, LoginUserForm, MealForm, CreateMealForm, \
+    DailyCalorieIntakeForm
+from fitnes_tracker.accounts.models import FitnessUser, DailyUserReport, DailyCalorieIntake, Meal, \
     Ingredients
 
 import requests
@@ -116,42 +117,6 @@ class LoginUserView(auth_views.LoginView):
 
 class LogoutUserView(auth_views.LogoutView):
     next_page = reverse_lazy('home page')
-
-
-@login_required
-def generate_daily_report(request, pk):
-    user = request.user
-    today = timezone.now().date()
-    if not DailyCalorieIntake.objects.filter(user=user, date=today).exists():
-        return render(request, 'accounts/daily_report.html')  # !!!!!!!!!!!!!!!!!! to fix redirect !!!!!!!!!!!!!!
-    else:
-        intake_calories_today = DailyCalorieIntake.objects.get(user=user, date=today)
-
-    if not DailyUserReport.objects.filter(user=user, date=today).exists():
-        DailyUserReport.objects.create(
-            user=user,
-            date=today,
-            daily_intake_calories=intake_calories_today,
-            target_calories=user.target_calories,
-            weigth=user.weigth
-        )
-    daily_report_last = DailyUserReport.objects.filter(user=user).lastest('date')
-    daily_reports = DailyUserReport.objects.all()
-
-    context = {
-        'daily_report': daily_report_last,
-        'daily_reports': daily_reports,
-    }
-    return render(request, 'accounts/daily_report.html', context=context)
-
-
-class DailyCaloriesIntake(LoginRequiredMixin, views.CreateView):
-    pass
-
-
-class DashboardUserView(LoginRequiredMixin, views.TemplateView):
-    login_url = 'account login'
-    template_name = 'home/dashboard.html'
 
 
 class GetFoodInfoView(View):
@@ -381,3 +346,77 @@ class DeleteMealView(LoginRequiredMixin, views.DeleteView):
             raise Http404
         else:
             return obj
+
+
+class DailyCaloriesIntake(LoginRequiredMixin,views.UpdateView):
+    model = DailyCalorieIntake
+    form_class = DailyCalorieIntakeForm
+    template_name = 'reports/daily_calories_intakes.html'
+
+
+    def get_object(self, queryset=None):
+        try:
+            return DailyCalorieIntake.objects.get(user=self.request.user, date=timezone.now().date())
+        except DailyCalorieIntake.DoesNotExist:
+            return DailyCalorieIntake(user=self.request.user)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        response = super().form_valid(form)
+
+        daily_report, created = DailyCalorieIntake.objects.get_or_create(user=self.request.user,
+                                                                  date=timezone.now().date())
+
+        # Update the respective meal in daily report
+        for key in form.cleaned_data.keys():
+            if hasattr(daily_report,key):
+                setattr(daily_report,key,form.cleaned_data[key])
+        daily_report.save()
+        return response
+
+
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('account login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('daily_calorie_intake', kwargs={'pk': self.request.user.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['daily_report'] = self.get_object()
+        return context
+
+class DailyReportListView(LoginRequiredMixin, views.ListView):
+    model = DailyUserReport
+    template_name = 'reports/daily_reports_list.html'
+    context_object_name = 'reports'
+
+
+@login_required
+def generate_daily_report(request, pk):
+    user = request.user
+    today = timezone.now().date()
+    if not DailyCalorieIntake.objects.filter(user=user, date=today).exists():
+        return render(request, 'reports/daily_calories_intakes.html')
+    else:
+        data = DailyCalorieIntake.objects.get(user=user, date=today)
+
+    if not DailyUserReport.objects.filter(user=user, date=today).exists():
+        DailyUserReport.objects.create(
+            user=data.user,
+            date=data.today,
+            daily_intake_calories=data.total_calories,
+            daily_protein_intake=data.total_protein,
+            daily_carbs_intake=data.total_carbs,
+            daily_fats_intake=data.total_fats,
+            weight=user.weight,
+        )
+    daily_report_last = DailyUserReport.objects.filter(user=user, date=today)
+
+    context = {
+        'daily_report': daily_report_last,
+    }
+    return render(request, 'reports/daily_calories_intakes.html', context=context)

@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+
+
+    <div class="intake-container">
+    <section class="form-container">
+        <form {% url 'daily_calorie_intake' pk=request.user.pk %} method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </section>
+
+    <section class="report-container">
+        <h2>{{ daily_report.user }}'s Calorie Intake for {{ daily_report.date }}</h2>
+
+        <div class="meals-list">
+
+            <p><strong>Breakfast:</strong> {{ daily_report.breakfast }}</p>
+            <p><strong>Morning Snack:</strong> {{ daily_report.morning_snack }}</p>
+            <p><strong>Lunch:</strong> {{ daily_report.lunch }}</p>
+            <p><strong>Afternoon Snack:</strong> {{ daily_report.afternoon_snack }}</p>
+            <p><strong>Dinner:</strong> {{ daily_report.dinner }}</p>
+            <p><strong>Evening Snack:</strong> {{ daily_report.evening_snack }}</p>
+        </div>
+
+        <div class="total-calories">
+            <p><strong>Total Calories:</strong> {{ daily_report.total_calories }} kcal</p>
+            <p><strong>Total Protein:</strong> {{ daily_report.total_calories }} kcal</p>
+            <p><strong>Total Carbs:</strong> {{ daily_report.total_calories }} kcal</p>
+            <p><strong>Total Fats:</strong> {{ daily_report.total_calories }} kcal</p>
+        </div>
+    </section>
+    </div>
+{% endblock %}
+
+
+

@@ -4,7 +4,8 @@ from django.contrib.auth import forms as auth_forms
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 
-from fitnes_tracker.accounts.models import GENDER, UserRole, UserLevel, UserActivity, UserGoals, Meal, Ingredients
+from fitnes_tracker.accounts.models import GENDER, UserRole, UserLevel, UserActivity, UserGoals, Meal, Ingredients, \
+    DailyCalorieIntake
 
 UserModel = get_user_model()
 
@@ -163,3 +164,43 @@ class CreateMealForm(forms.ModelForm):
         for field_name in self.fields:
             if self.fields[field_name] != self.fields['name']:
                 self.fields[field_name].widget.attrs.update({'class': 'create-meal-form', 'readonly': 'readonly'})
+
+
+class DailyCalorieIntakeForm(forms.ModelForm):
+    class Meta:
+        model = DailyCalorieIntake
+        fields = ['breakfast', 'morning_snack', 'lunch', 'afternoon_snack', 'dinner', 'evening_snack']
+
+        breakfast = forms.ModelChoiceField(
+            queryset=Meal.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control', }),
+            required=False,
+        )
+        morning_snack = forms.ModelChoiceField(
+            queryset=Meal.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control', }),
+            required=False,
+        )
+
+        lunch = forms.ModelChoiceField(
+            queryset=Meal.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control', }),
+            required=False,
+        )
+        afternoon_snack = forms.ModelChoiceField(
+            queryset=Meal.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control', }),
+            required=False,
+        )
+
+        dinner = forms.ModelChoiceField(
+            queryset=Meal.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control', }),
+            required=False,
+        )
+
+        evening_snack = forms.ModelChoiceField(
+            queryset=Meal.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control', }),
+            required=False,
+        )

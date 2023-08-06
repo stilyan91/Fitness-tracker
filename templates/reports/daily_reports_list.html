@@ -1,0 +1,17 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+    <div class="report-list-container">
+    <h1>Daily Reports</h1>
+    <ul class="report-list">
+        {% for report in reports %}
+        <li class="report-item">
+            <h2>{{ report.user.username }} - {{ report.date }}</h2>
+            <p><strong>Calories Intake:</strong> {{ report.daily_intake_calories }}</p>
+            <p><strong>Target Calories:</strong> {{ report.target_calories }}</p>
+            <p><strong>Weight:</strong> {{ report.weight }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock  %}

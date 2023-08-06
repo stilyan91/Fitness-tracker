@@ -1,0 +1,47 @@
+.intake-container {
+    display: flex;
+    width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.meals-list p, .total-calories p {
+    margin: 10px 0;
+    padding: 5px;
+    border-bottom: 1px dashed #ccc;
+}
+
+.total-calories {
+    margin-top: 20px;
+}
+
+.report-container {
+    width: 50%;
+}
+
+.form-container {
+    display: flex;
+    margin: 20px;
+    padding: 20px;
+}
+
+.form-container p {
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+}
+.form-container input {
+    width: 300px;
+    
+}
+
+
+.form-container > form > .btn-primary {
+    margin-top: 50px;
+    font-size: 32px;
+    
+}

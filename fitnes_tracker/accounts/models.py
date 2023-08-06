@@ -183,6 +183,9 @@ class Meal(models.Model):
     class Meta:
         unique_together = [['name', 'user']]
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         self.name = f"{self.name} by {self.user.username}"
         return super().save(*args, **kwargs)
@@ -253,13 +256,6 @@ class Progress(models.Model):
         return self.current_week
 
 
-class ArticleModel(models.Model):
-    title = models.CharField(max_length=30)
-    article_content = models.TextField()
-    created_by = models.ForeignKey(UserModel, models.CASCADE)
-    date = models.DateField(auto_now_add=True)
-
-
 class DailyCalorieIntake(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
@@ -273,24 +269,39 @@ class DailyCalorieIntake(models.Model):
     dinner = models.ForeignKey(Meal, related_name='dinner_meals', null=True, blank=True, on_delete=models.SET_NULL)
     evening_snack = models.ForeignKey(Meal, related_name='evening_snack_meals', null=True, blank=True,
                                       on_delete=models.SET_NULL)
+    total_protein = models.IntegerField(default=0)
+    total_carbs = models.IntegerField(default=0)
+    total_fats = models.IntegerField(default=0)
     total_calories = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.username}'s calorie intake for {self.date}"
 
-    def calculate_total_calories(self):
+    def calculate_total_nutrition(self):
         meals = [self.breakfast, self.morning_snack, self.lunch, self.afternoon_snack, self.dinner, self.evening_snack]
-        return sum(meal.calories for meal in meals if meal is not None)
+        meals = [meal for meal in meals if meal is not None]
+        self.total_calories = sum(meal.total_calories for meal in meals)
+        self.total_protein = sum(meal.total_protein for meal in meals)
+        self.total_carbs = sum(meal.total_carbs for meal in meals)
+        self.total_fats = sum(meal.total_fats for meal in meals)
 
     def save(self, *args, **kwargs):
-        self.total_calories = self.calculate_total_calories()
+        self.calculate_total_nutrition()
         super().save(*args, **kwargs)
 
 
 class DailyUserReport(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
-    daily_intake_calories = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE)
+    daily_intake_calories = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
+                                              related_name="daily_intake_calories_report", null=True)
+    daily_protein_intake = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
+                                             related_name="daily_intake_protein_report", null=True)
+    daily_carbs_intake = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
+                                           related_name="daily_intake_carbs_report", null=True)
+    daily_fats_intake = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
+                                          related_name="daily_intake_fats_report", null=True)
+    weight = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"{self.user.username}'s report for {self.date}"
