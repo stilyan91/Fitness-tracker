@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 
 from fitnes_tracker.accounts.models import GENDER, UserRole, UserLevel, UserActivity, UserGoals, Meal, Ingredients, \
-    DailyCalorieIntake
+    DailyCalorieIntake, WeightChangeIntensity
 
 UserModel = get_user_model()
 
@@ -78,12 +78,15 @@ class UserDetailsForm(forms.ModelForm):
     user_goal = forms.ChoiceField(choices=UserGoals.choice(), widget=forms.Select(attrs={
         "class": "form-user-goals",
     }))
+    weight_change_intensity = forms.ChoiceField(choices=WeightChangeIntensity.choices, widget=forms.Select(attrs={
+        "class": "form-user-goals",
+    }))
 
     class Meta:
         model = UserModel
         fields = ['username', 'first_name', 'last_name', 'email', 'profile_picture',
-                  'height', 'weight', 'gender', 'age', 'user_role',
-                  'user_level', 'user_activity', 'user_goal']
+                  'height', 'weight', 'gender', 'age',
+                  'user_level', 'user_activity', 'user_goal', 'weight_change_intensity']
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -204,3 +207,7 @@ class DailyCalorieIntakeForm(forms.ModelForm):
             widget=forms.Select(attrs={'class': 'form-control', }),
             required=False,
         )
+
+
+class WeightForm(forms.Form):
+    weight = forms.FloatField(label='Your Weight (in kg)', required=True)

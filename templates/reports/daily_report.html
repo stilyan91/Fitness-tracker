@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+{% block page_content %}
+
+
+    {% if not daily_report %}
+        <form method="post" action="{% url 'create_daily_report' pk=request.user.pk %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+        <button type="submit" class="weight-btn">Create report</button>
+    </form>
+
+    {% else %}
+        <section class="daily-report">
+            <h1>Daily Report</h1>
+            <p>This is your daily report for {{ daily_report.date }} kcal</p>
+            <table>
+                <tr>
+                    <th>Calories: </th>
+                    <td>{{ daily_report.daily_intake_calories }} kcal </td>
+                    <th>Target Calories: </th>
+                    <td>{{ target_calories }} kcal </td>
+                </tr>
+                <tr>
+                    <th>Protein</th>
+                    <td>{{ daily_report.daily_protein_intake }} grams</td>
+                </tr>
+                <tr>
+                    <th>Carbs</th>
+                    <td>{{ daily_report.daily_carbs_intake }} grams</td>
+                </tr>
+                <tr>
+                    <th>Fats</th>
+                    <td>{{ daily_report.daily_fats_intake }} grams</td>
+                </tr>
+                <tr>
+                    <th>Weight</th>
+                    <td>{{ request.user.weight }} kg</td>
+                </tr>
+            </table>
+
+
+        </section>
+    {% endif %}
+
+
+{% endblock %}

@@ -149,7 +149,16 @@ class FitnessUser(auth_models.AbstractUser):
         return self.target_calories
 
     def save(self, *args, **kwargs):
-        if self.age is not None and self.weight is not None and self.height is not None:
+        recalculate = False
+
+        if self.pk:
+            original_instance = UserModel.objects.get(pk=self.pk)
+            if (original_instance.user_goal != self.user_goal or
+                    original_instance.user_activity != self.user_activity or
+                    original_instance.weight != self.weight):
+                recalculate = True
+
+        if (self.weight > 0 and self.height > 0 and self.age > 0) or recalculate:
             self.maintenance_calories = self.calculate_daily_calories_maintenance()
             self.target_calories = self.calculate_target_calories()
         super().save(*args, **kwargs)
@@ -293,14 +302,10 @@ class DailyCalorieIntake(models.Model):
 class DailyUserReport(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
-    daily_intake_calories = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
-                                              related_name="daily_intake_calories_report", null=True)
-    daily_protein_intake = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
-                                             related_name="daily_intake_protein_report", null=True)
-    daily_carbs_intake = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
-                                           related_name="daily_intake_carbs_report", null=True)
-    daily_fats_intake = models.ForeignKey(DailyCalorieIntake, on_delete=models.CASCADE,
-                                          related_name="daily_intake_fats_report", null=True)
+    daily_intake_calories = models.IntegerField(default=0)
+    daily_protein_intake = models.IntegerField(default=0)
+    daily_carbs_intake = models.IntegerField(default=0)
+    daily_fats_intake = models.IntegerField(default=0)
     weight = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
