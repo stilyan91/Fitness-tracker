@@ -5,7 +5,7 @@
 
     <div class="intake-container">
     <section class="form-container">
-        <form {% url 'daily_calorie_intake' pk=request.user.pk %} method="POST">
+        <form action="{% url 'daily_calorie_intake' pk=request.user.pk %}" method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Submit</button>

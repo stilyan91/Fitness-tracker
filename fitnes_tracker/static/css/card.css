@@ -1,7 +1,6 @@
 /* Home page  */
 .article-container {
     display: flex;
-    justify-content: space-between;
     position: relative;
     flex-wrap: wrap;
     gap:50px;

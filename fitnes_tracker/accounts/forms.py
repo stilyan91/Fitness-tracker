@@ -1,8 +1,6 @@
 from django import forms
-from django.contrib.auth import models as auth_models, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth import forms as auth_forms
-from django.shortcuts import redirect
-from django.utils.translation import gettext_lazy as _
 
 from fitnes_tracker.accounts.models import GENDER, UserRole, UserLevel, UserActivity, UserGoals, Meal, Ingredients, \
     DailyCalorieIntake, WeightChangeIntensity

@@ -14,7 +14,7 @@
         </li>
         <li class="nav-item">
             <i class="far fa-calendar"></i>
-            <a href="#" class="nav-item">
+            <a href="{% url 'calendar' pk=request.user.pk %}" class="nav-item">
                 Calendar
             </a>
         </li>

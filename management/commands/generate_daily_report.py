@@ -14,11 +14,13 @@ class Command(BaseCommand):
             user_intake_calories = DailyCalorieIntake.objects.get(user=user, date=today)
             if not DailyUserReport.objects.filter(user=user, date=today).exist():
                 DailyUserReport.objects.create(
-                    user=user,
-                    date=today,
-                    target_calories=user.target_calories,
+                    user=user_intake_calories,
+                    date=user_intake_calories,
                     daily_intake_calories=user_intake_calories.total_calories,
-                    weight=user.weight,
+                    daily_protein_intake=user_intake_calories.total_protein,
+                    daily_carbs_intake=user_intake_calories.total_carbs,
+                    daily_fats_intake=user_intake_calories.total_fats,
+                    weight=user_intake_calories.weight
                 )
 
             self.stdout.write(self.style.SUCCESS('Succesfully generated daily report!'))

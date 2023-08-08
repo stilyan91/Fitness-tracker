@@ -72,7 +72,6 @@ class FitnessUser(auth_models.AbstractUser):
                                         null=True,
                                         blank=True,
                                         max_length=500,
-                                        validators=[]
                                         )
     height = models.IntegerField(
         verbose_name='Height in sm',
@@ -181,7 +180,7 @@ class Ingredients(models.Model):
 
 
 class Meal(models.Model):
-    name = models.CharField(max_length=30, validators=[MinLengthValidator(4)])
+    name = models.CharField(max_length=100, validators=[MinLengthValidator(4)])
     total_calories = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
     list_of_ingredients = models.JSONField(default=list, blank=True, null=True)
     total_protein = models.IntegerField(default=0, validators=[MinValueValidator(0)], blank=True, null=True)
@@ -196,73 +195,9 @@ class Meal(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.name = f"{self.name} by {self.user.username}"
+        if not self.pk:
+            self.name = f"{self.name} by {self.user.username}"
         return super().save(*args, **kwargs)
-
-
-class MealPlan(models.Model):
-    title = models.CharField(max_length=100, )
-    description = models.TextField()
-    meals = models.ManyToManyField(Meal)
-    date_created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.title
-
-
-class Exercise(models.Model):
-    name = models.CharField(max_length=30)
-    muscle_group = models.CharField(max_length=30)
-    description = models.TextField()
-    video_link = models.URLField(null=True, blank=True)
-
-
-class Workout(models.Model):
-    name = models.CharField(max_length=30)
-    description = models.TextField()
-    created_by = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    exercises = models.ManyToManyField(Exercise, blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Plan(models.Model):
-    name = models.CharField(max_length=30)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    workouts = models.ManyToManyField(Workout)
-    meal_plan = models.ForeignKey(MealPlan, on_delete=models.CASCADE)
-    start_date = models.DateField(auto_now_add=True)
-    duration = models.IntegerField(verbose_name='Duration (in weeks)')
-    end_date = models.DateField(blank=True, null=True)
-    is_active = models.BooleanField(default=False, null=True, blank=True)
-
-    def __str__(self):
-        return self.user.get_full_name()
-
-    def save(self, *args, **kwargs):
-        self.start_date = self.start_date or datetime.now().date()
-        self.end_date = self.start_date + timedelta(weeks=self.duration)
-        super().save(*args, **kwargs)
-
-
-class Progress(models.Model):
-    current_plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
-    weight = models.FloatField(verbose_name='Weight in kgs')
-    current_week = models.DateField(null=True, blank=True)
-    body_fat_percentage = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        if self.user.first_name and self.user.last_name:
-            return self.user.get_full_name()
-        else:
-            return self.user.username
-
-    def calc_current_week(self):
-        self.current_week = timedelta(weeks=datetime.now().date() - self.current_plan.start_time)
-        return self.current_week
 
 
 class DailyCalorieIntake(models.Model):
@@ -322,3 +257,4 @@ class DailyUserReport(models.Model):
     @property
     def weight(self):
         return self.user.weight
+

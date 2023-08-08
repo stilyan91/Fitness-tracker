@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from .models import FitnessUser, MealPlan, Meal, Progress, Plan, Workout, Exercise
+from .models import FitnessUser, Meal, DailyCalorieIntake, DailyUserReport
 
 UserModel = get_user_model()
 
@@ -15,40 +15,24 @@ class UserModelAdmin(admin.ModelAdmin):
     ordering = ['username']
 
 
-@admin.register(MealPlan)
-class MealPlanModeAdmin(admin.ModelAdmin):
-    search_fields = ['title', 'description', ]
-    list_display = ['title', 'description', ]
-    list_filter = ['title']
-    filter_horizontal = ['meals'] \
-
-@admin.register(Exercise)
-class ExercisesModelAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    search_fields = ['name', 'description', 'muscle_group']
-    list_filter = ['name', 'muscle_group']
-
-    def __str__(self):
-        return self.name
+@admin.register(Meal)
+class MealModelAdmin(admin.ModelAdmin):
+    list_display = ['name', 'total_calories', 'list_of_ingredients', 'total_protein', 'total_carbs', 'total_fats',
+                    'user']
+    search_fields = ['name', 'user', 'total_calories']
 
 
-@admin.register(Workout)
-class WorkoutsModelAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    list_filter = ['name', 'created_by', ]
-    search_fields = ['name', 'created_by', 'exercises']
-    filter_horizontal = ['exercises']
+@admin.register(DailyCalorieIntake)
+class DailyCaloriesAdmin(admin.ModelAdmin):
+    list_display = ['date', 'user', 'breakfast', 'morning_snack', 'lunch', 'afternoon_snack', 'dinner', 'evening_snack',
+                    'total_calories', 'total_protein', 'total_carbs', 'total_fats']
+
+    search_fields = ['date', 'user', 'breakfast', 'morning_snack', 'lunch', 'afternoon_snack', 'dinner',
+                     'evening_snack',
+                     'total_calories', 'total_protein', 'total_carbs', 'total_fats']
 
 
-@admin.register(Plan)
-class PlanModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'user']
-    filter_horizontal = ['workouts']
-    list_select_related = ['user']
-    readonly_fields = ['end_date']
-
-
-@admin.register(Progress)
-class ProgressAdminModel(admin.ModelAdmin):
-    list_display = ['user']
-    readonly_fields = ['current_week']
+@admin.register(DailyUserReport)
+class DailyUserReportAdmin(admin.ModelAdmin):
+    list_display = ['user', 'date', 'daily_intake_calories', 'daily_protein_intake', 'daily_carbs_intake',
+                    'daily_fats_intake', 'weight']

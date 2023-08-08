@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+{% load my-custom-tags %}
+{% block page_content %}
+
+
+    <div class="calendar">
+        <table border="1">
+            <h1>{{ month_name }} {{ year }}</h1>
+            <thead>
+            <tr>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for week in calendar %}
+                <tr>
+                    {% for day in week %}
+                        <td>
+                            {% if day != 0 %}
+                                {{ day }}
+                                {% with report=reports|find_report_for_date:day %}
+                                    {% if report %}
+                                        <br>
+                                        <a href="{% url 'show_daily_report' pk=request.user.pk %}">View Report</a>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        <div class="buttons-month">
+            <a href="{% url 'monthly_report' year=prev_year month=prev_month %}">Previous Month</a>
+            <a href="{% url 'monthly_report' year=next_year month=next_month %}">Next Month</a>
+        </div>
+    </div>
+{% endblock %}

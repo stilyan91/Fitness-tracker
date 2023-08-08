@@ -1,7 +1,45 @@
 .user-greetings {
   font-size: 50px;
 }
+#form > form > div > p:nth-child(4) > span {
+  display: none;
+}
+#form {
+  display: flex;
+    justify-content: center; 
+    align-items: center;
+    height: 100%;
+    flex-wrap: wrap;     
 
+}
+#form > form {
+  max-width: 95vw;
+  max-height: 95vh;
+
+}
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+
+
+.form-container p {
+  max-width: 90%; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.form-container label, .form-container input {
+  flex: 1; 
+  margin: 5px; 
+}
+
+.form-container input {
+  width: 30%; 
+}
 .register-form label {
   display: inline-block;
   width: 200px; 
@@ -11,6 +49,7 @@
 .btn-register .form-user-btn-update {
   display: inline-block;
   font-weight: 400;
+  overflow: hidden;
   color: #212529;
   text-align: center;
   vertical-align: middle;
@@ -59,8 +98,8 @@
   margin-left: auto;
 }
 
-span .helptext{ 
-  font-size: 24px;
+#body > main > form > div > p:nth-child(4) > span{ 
+  display: none !important;
 }
 
 .form-user-activity {

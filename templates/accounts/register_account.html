@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% block page_content %}
+    <div id="form">
     <form action="{% url 'account register' %}" method="post" class="register-form">
         <div class="form-container">
             {{ form.as_p }}
@@ -11,4 +12,6 @@
             </div>
         </div>
     </form>
+    </div>
+
 {% endblock %}

@@ -1,5 +1,8 @@
+import calendar
+import datetime
 import json
 import re
+from datetime import date
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -121,6 +124,7 @@ class LogoutUserView(auth_views.LogoutView):
 
 class GetFoodInfoView(View):
     def get(self, request, *args, **kwargs):
+        user = request.user
         form = MealForm()
         meal_id = request.session.get('meal_id')
         coming_from_details = request.session.get('coming_from_details', False)
@@ -139,12 +143,13 @@ class GetFoodInfoView(View):
                 'form': form,
                 'meal_id': None,
                 'show_add_ingredient_button': coming_from_details,
+                'user': user
             }
 
         return render(request, 'home/get_food_info.html', context=context)
 
     def post(self, request, *args, **kwargs):
-
+        user = request.user
         edamam = Edamam()
         try:
             data = json.loads(request.body)
@@ -174,8 +179,6 @@ class GetFoodInfoView(View):
                 'food_types': food_types,
                 'meal_id': meal_id,
             }
-            # meal_dict = model_to_dict(ingredient)
-            # meal_dict["food_types"] = food_types
 
             return JsonResponse(ingredient)
 
@@ -354,24 +357,12 @@ class DailyCaloriesIntake(LoginRequiredMixin, views.UpdateView):
     template_name = 'reports/daily_calories_intakes.html'
 
     def get_object(self, queryset=None):
-        try:
-            return DailyCalorieIntake.objects.get(user=self.request.user, date=timezone.now().date())
-        except DailyCalorieIntake.DoesNotExist:
-            return DailyCalorieIntake(user=self.request.user)
+        daily_report, created = DailyCalorieIntake.objects.get_or_create(user=self.request.user, date=timezone.now().date())
+        return daily_report
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        response = super().form_valid(form)
-
-        daily_report, created = DailyCalorieIntake.objects.get_or_create(user=self.request.user,
-                                                                         date=timezone.now().date())
-
-        # Update the respective meal in daily report
-        for key in form.cleaned_data.keys():
-            if hasattr(daily_report, key):
-                setattr(daily_report, key, form.cleaned_data[key])
-        daily_report.save()
-        return response
+        return super().form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -386,12 +377,10 @@ class DailyCaloriesIntake(LoginRequiredMixin, views.UpdateView):
         context['daily_report'] = self.get_object()
         return context
 
-
 class DailyReportListView(LoginRequiredMixin, views.ListView):
     model = DailyUserReport
     template_name = 'reports/daily_reports_list.html'
     context_object_name = 'reports'
-
 
 @login_required
 def show_daily_report(request, pk):
@@ -403,10 +392,9 @@ def show_daily_report(request, pk):
     context = {
         'daily_report': report,
         'form': form,
-        'target_calories':target_calories,
+        'target_calories': target_calories,
     }
     return render(request, 'reports/daily_report.html', context=context)
-
 
 def generate_daily_report(request, pk):
     if not request.user.is_authenticated:
@@ -419,7 +407,7 @@ def generate_daily_report(request, pk):
     try:
         data = DailyCalorieIntake.objects.get(user=user, date=today)
     except DailyCalorieIntake.DoesNotExist:
-        redirect('create_daily_report', kwargs={'pk': request.user.pk})
+        return redirect('daily_calorie_intake', pk=user.pk)
 
     if request.method == "POST":
         form = WeightForm(request.POST)
@@ -439,3 +427,39 @@ def generate_daily_report(request, pk):
         )
 
     return redirect('show_daily_report', pk=user.pk)
+
+@login_required
+def calendar_view(request, pk, year=date.today().year, month=date.today().month):
+    user = request.user
+    start_date = date(year, month, 1)
+    end_date = date(year, month + 1, 1)
+    reports = DailyUserReport.objects.filter(date__range=(start_date, end_date))
+    reports_by_date = {report.date: report for report in reports}
+    my_calendar = calendar.monthcalendar(year, month)
+    month_name = calendar.month_name[month]
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        prev_year = year
+
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+    context = {
+        'calendar': my_calendar,
+        'reports': reports,
+        'reports_by_date': reports_by_date,
+        'prev_month': prev_month,
+        'prev_year': prev_year,
+        'next_month': next_month,
+        'next_year': next_year,
+        'month_name': month_name,
+        'year': year,
+    }
+
+    return render(request, 'reports/calendar.html', context)
