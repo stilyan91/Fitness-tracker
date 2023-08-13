@@ -1,2 +1,4 @@
 /envs/
 /fitnes_tracker/accounts/utilis.py
+.idea
+__pycache__

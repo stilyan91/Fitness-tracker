@@ -235,6 +235,7 @@ class DailyCalorieIntake(models.Model):
 
 
 class DailyUserReport(models.Model):
+
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     daily_intake_calories = models.IntegerField(default=0)
