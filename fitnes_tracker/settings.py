@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'SECRET_KEY2')
 DEBUG = os.environ.get('DEBUG', False)
 
-ALLOWED_HOSTS = ['fitnes-tracker.site']
+ALLOWED_HOSTS = ['https://fitnes-tracker.site', 'https://mysite-6rdp.onrender.com/']
 
 # Application definition
 
