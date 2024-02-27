@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+import dj_database_url
 from manage import load_env
 load_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -58,15 +59,16 @@ WSGI_APPLICATION = 'fitnes_tracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+DATABASE_URL = os.environ.get('DATABASE_URL')
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('DB_NAME'),
-        "USER": os.environ.get('DB_USER'),
-        "PASSWORD": os.environ.get('DB_PASSWORD'),
-        "HOST": os.environ.get('DB_HOST'),
-        "PORT": os.environ.get('DB_PORT'),
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+        # "ENGINE": "django.db.backends.postgresql",
+        # "NAME": os.environ.get('DB_NAME'),
+        # "USER": os.environ.get('DB_USER'),
+        # "PASSWORD": os.environ.get('DB_PASSWORD'),
+        # "HOST": os.environ.get('DB_HOST'),
+        # "PORT": os.environ.get('DB_PORT'),
 
     }
 }
@@ -109,6 +111,9 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE='whitenoise.storage.CompressedManifestStaticFileStorage'
 STATICFILES_DIRS = [
     BASE_DIR / "fitnes_tracker/static/"]
 
