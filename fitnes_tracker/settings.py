@@ -63,8 +63,8 @@ WSGI_APPLICATION = 'fitnes_tracker.wsgi.application'
 
 DATABASES = {
     "default": {
-        'default': dj_database_url.config(default='DATABASE_URL', conn_max_age=600)
-        # "ENGINE": "django.db.backends.postgresql",
+        'default': dj_database_url.config(default='DATABASE_URL', conn_max_age=600),
+        "ENGINE": "django.db.backends.postgresql",
         # "NAME": os.environ.get('DB_NAME'),
         # "USER": os.environ.get('DB_USER'),
         # "PASSWORD": os.environ.get('DB_PASSWORD'),
