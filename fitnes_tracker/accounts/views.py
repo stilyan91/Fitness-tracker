@@ -357,7 +357,8 @@ class DailyCaloriesIntake(LoginRequiredMixin, views.UpdateView):
     template_name = 'reports/daily_calories_intakes.html'
 
     def get_object(self, queryset=None):
-        daily_report, created = DailyCalorieIntake.objects.get_or_create(user=self.request.user, date=timezone.now().date())
+        daily_report, created = DailyCalorieIntake.objects.get_or_create(user=self.request.user,
+                                                                         date=timezone.now().date())
         return daily_report
 
     def form_valid(self, form):
@@ -377,10 +378,12 @@ class DailyCaloriesIntake(LoginRequiredMixin, views.UpdateView):
         context['daily_report'] = self.get_object()
         return context
 
+
 class DailyReportListView(LoginRequiredMixin, views.ListView):
     model = DailyUserReport
     template_name = 'reports/daily_reports_list.html'
     context_object_name = 'reports'
+
 
 @login_required
 def show_daily_report(request, pk):
@@ -395,6 +398,7 @@ def show_daily_report(request, pk):
         'target_calories': target_calories,
     }
     return render(request, 'reports/daily_report.html', context=context)
+
 
 def generate_daily_report(request, pk):
     if not request.user.is_authenticated:
@@ -427,6 +431,7 @@ def generate_daily_report(request, pk):
         )
 
     return redirect('show_daily_report', pk=user.pk)
+
 
 @login_required
 def calendar_view(request, pk, year=date.today().year, month=date.today().month):
@@ -463,3 +468,24 @@ def calendar_view(request, pk, year=date.today().year, month=date.today().month)
     }
 
     return render(request, 'reports/calendar.html', context)
+
+
+def get_food_info_proxy(request):
+    if request.method == 'POST':
+        # Extract food name from POST request
+        data = json.loads(request.body)
+        food_name = data.get('food')
+
+        if food_name:
+            # Create an instance of your Edamam class
+            edamam = Edamam()
+
+            # Fetch the food data
+            response_data = edamam.get_food_data(food_name)
+
+            # Return the data as a JsonResponse
+            return JsonResponse(response_data)
+        else:
+            return JsonResponse({"error": "Missing food name"}, status=400)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
