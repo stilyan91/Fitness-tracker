@@ -5,7 +5,7 @@ from manage import load_env
 load_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY2')
 DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
@@ -59,7 +59,7 @@ WSGI_APPLICATION = 'fitnes_tracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL2')
 DATABASES = {
     "default": {
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
@@ -113,7 +113,8 @@ USE_TZ = False
 STATIC_URL = '/static/'
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE='whitenoise.storage.CompressedManifestStaticFileStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 STATICFILES_DIRS = [
     BASE_DIR / "fitnes_tracker/static/"]
 
