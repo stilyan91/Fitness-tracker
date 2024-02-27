@@ -23,7 +23,7 @@
 
         </div>
 
-        <button type="button" onclick="searchFood()">Get Info</button>
+        <button type="button" onclick="searchFoodDirectly()">Get Info</button>
         <button type="button" onclick="clearFood()">Clear</button>
         {% if show_add_ingredient_button %}
             <button type="button" id="add-ingredients">ADD Ingredients</button>
@@ -204,6 +204,44 @@
                 fats: fatsInput.value,
             };
         }
+function searchFoodDirectly() {
+    const foodName = document.getElementById('mealName').value;
 
+    // Note: Directly using your API key here exposes it to anyone who views your webpage's source code.
+    const app_id = os.environ.get('API_id')
+    const app_key = os.environ.get('API_key')
+    const api_endpoint = `https://api.edamam.com/api/food-database/v2/parser?ingr=${encodeURIComponent(foodName)}&app_id=${app_id}&app_key=${app_key}`;
+
+    fetch(api_endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Assuming the API returns the data in a structure that includes 'calories', 'protein', etc.
+            // You'll need to adjust this based on the actual API response structure.
+
+            // Example structure adjustment
+            const foodData = data.hints[0].food.nutrients;
+
+            let quantityInput = parseFloat(document.querySelector("#id_quantity").value);
+            let caloriesInput = document.querySelector("#id_calories");
+            let proteinInput = document.querySelector("#id_protein");
+            let carbohydratesInput = document.querySelector("#id_carbohydrates");
+            let fatsInput = document.querySelector("#id_fats");
+
+            quantityInput = isNaN(quantityInput) ? 0 : quantityInput;
+
+            caloriesInput.value = ((quantityInput * foodData.ENERC_KCAL) / 100).toFixed(2); // Example nutrient key
+            proteinInput.value = ((quantityInput * foodData.PROCNT) / 100).toFixed(2); // Adjust based on actual keys
+            carbohydratesInput.value = ((quantityInput * foodData.CHOCDF) / 100).toFixed(2);
+            fatsInput.value = ((quantityInput * foodData.FAT) / 100).toFixed(2);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+}
     </script>
 {% endblock %}
