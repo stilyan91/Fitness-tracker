@@ -62,17 +62,21 @@ WSGI_APPLICATION = 'fitnes_tracker.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        'default': dj_database_url.config(default='DATABASE_URL', conn_max_age=600),
-        "ENGINE": "django.db.backends.postgresql",
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}
+
+# DATABASES = {
+#     "default": {
+#         'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=600),
+#         "ENGINE": "django.db.backends.postgresql",
         # "NAME": os.environ.get('DB_NAME'),
         # "USER": os.environ.get('DB_USER'),
         # "PASSWORD": os.environ.get('DB_PASSWORD'),
         # "HOST": os.environ.get('DB_HOST'),
         # "PORT": os.environ.get('DB_PORT'),
 
-    }
-}
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
