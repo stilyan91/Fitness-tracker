@@ -6,7 +6,7 @@ class Edamam(object):
         self.app_key = os.environ.get('API_key')
 
     def get_food_data(self, food_name):
-        api_endpoint = "https://api.edamam.com/api/food-database/v2/parser"
+        api_endpoint = "https://api.edamam.com/auto-complete"
         payload = {
             "ingr": food_name,
             "app_id": self.app_id,
