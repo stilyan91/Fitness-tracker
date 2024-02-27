@@ -12,6 +12,5 @@ class Edamam(object):
             "app_id": self.app_id,
             "app_key": self.app_key,
         }
-        headers = {'accept': 'application/json'}
-        response = requests.get(api_endpoint, params=payload, headers=headers)
+        response = requests.get(api_endpoint, params=payload)
         return response.json()
