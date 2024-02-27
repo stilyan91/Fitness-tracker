@@ -59,7 +59,7 @@ WSGI_APPLICATION = 'fitnes_tracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASE_URL = os.environ.get('DATABASE_URL2')
+DATABASE_URL = os.environ.get('DATABASE_URL2','postgres://mysite:ePhnslerWaDruyejAnGsb7UEc8ZZWerz@dpg-cnessv6v3ddc73ad3uk0-a/mysite_jak0')
 DATABASES = {
     "default": {
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)

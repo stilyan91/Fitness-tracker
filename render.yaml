@@ -12,10 +12,10 @@ services:
     buildCommand: "./build.sh"
     startCommand: "python -m gunicorn fitnes_tracker.asgi:application -k uvicorn.workers.UvicornWorker"
     envVars:
-      - key: DATABASE_URL
+      - key: DATABASE_URL2
         fromDatabase:
           name: mysitedb
-          property: connectionString
+          property: postgres://mysite:ePhnslerWaDruyejAnGsb7UEc8ZZWerz@dpg-cnessv6v3ddc73ad3uk0-a/mysite_jak0
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
