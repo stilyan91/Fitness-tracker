@@ -5,7 +5,8 @@ from manage import load_env
 load_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY2')
+# SECRET_KEY = os.environ.get('SECRET_KEY2')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'SECRET_KEY2')
 DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
@@ -59,10 +60,10 @@ WSGI_APPLICATION = 'fitnes_tracker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASE_URL = os.environ.get('DATABASE_URL2','postgres://mysite:ePhnslerWaDruyejAnGsb7UEc8ZZWerz@dpg-cnessv6v3ddc73ad3uk0-a/mysite_jak0')
+
 DATABASES = {
     "default": {
-        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+        'default': dj_database_url.config(default='DATABASE_URL', conn_max_age=600)
         # "ENGINE": "django.db.backends.postgresql",
         # "NAME": os.environ.get('DB_NAME'),
         # "USER": os.environ.get('DB_USER'),
